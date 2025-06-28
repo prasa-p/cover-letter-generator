@@ -1,60 +1,111 @@
+# app.py  ────────────────────────────────────────────────────────────────
 import json
-from flask import request
-from flask import Flask, render_template, redirect, url_for, session
-app = Flask(__name__)
-from crawler import crawl
-from resume_pdf import get_resume
-import config
+from datetime import datetime
 
+from flask import Flask, render_template, request
+from resume_pdf import get_resume        # helper that extracts text from PDF
+from config import COHERE_API_KEY
 
 import cohere
-co = cohere.Client(config.api_key) #This is your trial API key
+co = cohere.Client(COHERE_API_KEY)       # prod / trial key
+
+app = Flask(__name__)
 
 
-@app.route('/')
+# -------- helper: first non-blank line becomes user's name --------------
+def extract_name(resume_text: str) -> str:
+    for line in resume_text.splitlines():
+        line = line.strip()
+        if line:
+            return line
+    return "Your Name"
+
+
+# -----------------------------------------------------------------------
+@app.route("/")
 def index():
-    return render_template('home.html')
+    return render_template("home.html")
 
 
-@app.route('/output.html', methods=['GET', 'POST'])
+# ====================  OUTPUT ROUTE  ===================================
+@app.route("/output.html", methods=["GET", "POST"])
 def output():
-    with open('job.txt', 'r') as file:
-        job = file.read()
-    with open('resume.txt', 'r') as file:
-        resume = file.read()
+    # load previously-saved files
+    with open("job.txt", "r") as f:
+        job = f.read()
+    with open("resume.txt", "r") as f:
+        resume = f.read()
+
+    user_name = extract_name(resume)
+
+    # --------- Cohere prompt (more convincing) --------------------------
+    prompt = f"""
+Generate a persuasive 4-paragraph cover letter for the position below.
+
+Job description:
+{job}
+
+Candidate résumé:
+{resume}
+
+Guidelines:
+- Start with a warm, enthusiastic opening that names the role and company.
+- Tie 2-3 skills or projects from the résumé to the job’s needs.
+- Show genuine excitement about Yelp’s mission (Pro Response, user engagement).
+- Keep tone confident, professional, and human.
+- End with “Sincerely,” followed by the candidate’s name.
+
+Cover Letter:
+"""
+
     response = co.generate(
-        model='3d0973e1-2d16-48e8-b499-c7611368d0b2-ft',
-        prompt='Job Description:\n' + job + '\n\n' + 'Resume:\n' + resume + '\n\n' + 'Cover Letter:\n',
-        max_tokens=200,
-        temperature=1,
+        model="command",          # free/public model
+        prompt=prompt,
+        max_tokens=300,
+        temperature=0.9,
         k=0,
         p=0.75,
         frequency_penalty=0,
         presence_penalty=0,
         stop_sequences=[],
-        return_likelihoods='NONE')
-    prediction = 'Prediction: {}'.format(response.generations[0].text)
-    print(prediction)
+        return_likelihoods="NONE",
+    )
 
-    return render_template('output.html', job=job, resume=resume, prediction = prediction)
+    prediction = response.generations[0].text.strip()
+
+    # Ensure the closing signature is present and not duplicated
+    if "Sincerely" not in prediction:
+        prediction += f"\n\nSincerely,\n\n{user_name}"
+    elif "Sincerely" in prediction and user_name not in prediction:
+        prediction += f"\n\n{user_name}"
+
+    return render_template(
+        "output.html",
+        prediction=prediction,
+        job=job,
+        resume=resume,
+        today_date=datetime.today().strftime("%B %d, %Y"),
+        user_name=user_name,
+    )
 
 
-@app.route('/input.html', methods=['GET', 'POST'])
+# ====================  INPUT ROUTE  ====================================
+@app.route("/input.html", methods=["GET", "POST"])
 def input():
     if request.method == "POST":
-        output = request.get_json()
-        result = json.loads(output)
-        job = crawl(result.get("job")).strip()
-        print(job)
-        with open('job.txt', 'w') as f:
-            f.write(job)
-        resume = get_resume(result.get("resume"))
-        print(resume)
-        with open('resume.txt', 'w') as f:
-            f.write(resume)
-        return render_template("output.html")
-    else:
-        return render_template("input.html")
+        data = json.loads(request.get_json())
 
-if __name__ == '__main__':
-   app.run()
+        with open("job.txt", "w") as f:
+            f.write(data.get("job", ""))
+
+        resume_text = get_resume(data.get("resume"))
+        with open("resume.txt", "w") as f:
+            f.write(resume_text)
+
+        return render_template("output.html")
+    return render_template("input.html")
+
+
+# -----------------------------------------------------------------------
+if __name__ == "__main__":
+    app.run(debug=True)
