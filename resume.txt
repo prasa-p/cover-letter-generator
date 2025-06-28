@@ -1,0 +1,115 @@
+Sara Lu
+123-456-7890
+| sara.lu123@gmail.com
+TECHNICAL SKILLS
+Languages:
+Python | Java| Swift | Ruby
+Developer Tools:
+Git | Jira (Agile) | MongoDB | Jupyter
+Technologies/Frameworks:
+TensorFlow | NumPy | React
+| ROS
+Summary
+Motivated
+student
+completing
+Computer
+Science
+degree.
+Experienced
+in
+Agile
+and
+Scrum
+environments. 
+Supports
+team
+administrative,
+project
+coordination,
+design
+and
+programming
+needs.
+Fluent
+in
+English. 
+School
+projects
+included
+building
+apps,
+optimizing
+programs
+and
+validating
+code.
+Complex 
+problem-solver
+with
+analytical
+and
+driven
+mindset.
+Dedicated
+to
+achieving
+demanding
+development 
+objectives
+according
+to
+tight
+schedules
+while
+producing
+impeccable
+code.
+Multitalented
+Mobile
+Developer 
+with
+experience
+in
+Java
+software
+industry .
+Demonstrated
+excellent
+skills
+in
+HTML,
+JavaScript
+and
+Python. 
+True team player with strengths in adaptability and accuracy .
+EXPERIENCE
+Software Developer Intern
+October 2022 
+CIBC
+Waterloo, ON 
+●
+Supported development, QA  and user experience staf f to develop new products. 
+●
+Developed a web-based app project using Ruby programming language. 
+●
+Learned software engineering process improvements and best practices. 
+●
+Wrote clear , clean code for various projects using native Android development
+Mobile Developer
+January 2022 - May 2022 
+TD Bank
+Waterloo, ON 
+●
+Collaborated across multi-disciplinary teams using Agile development frameworks. 
+●
+Developed landing pages, dashboards and online applications using Python, Java and Swift scripting. 
+●
+Developed landing pages, dashboards and online applications using Python, Java and Swift scripting. 
+●
+Documented design patterns for UX and UI as templates in subsequent patches and iterative app
+development cycles.
+EDUCATION
+University of Waterloo
+Sept 1999 - May 2002 
+B.Sc in Computer Science, Minor in Machine Learning
